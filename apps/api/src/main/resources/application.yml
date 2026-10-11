@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: northrail
+  datasource:
+    url: jdbc:postgresql://localhost:5432/northrail
+    username: ledger_admin
+    password: ledger_admin
