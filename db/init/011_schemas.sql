@@ -28,6 +28,9 @@ CREATE TABLE pii.customers(
 INSERT INTO ledger.accounts (customer_id) VALUES (300);
 INSERT INTO pii.customers (customer_id, full_name) VALUES (300, 'User Test');
 
+INSERT INTO ledger.accounts (customer_id) VALUES (400);
+INSERT INTO pii.customers (customer_id, full_name) VALUES (400, 'User Test2');
+
 /* Role permission */
 GRANT CONNECT ON DATABASE northrail TO ledger_admin;
 GRANT CONNECT ON DATABASE northrail TO pii_admin;
