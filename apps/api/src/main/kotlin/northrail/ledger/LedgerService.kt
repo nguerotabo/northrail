@@ -31,4 +31,14 @@ class LedgerService {
             statement.executeUpdate()
         }
     }
+ 
+    fun calculateBalance(connection: Connection, accountId: Long): Int {
+        val sql = "select sum(amount) from ledger.entries where account_id = ?"
+        connection.prepareStatement(sql).use { statement ->
+            statement.setLong(1, accountId)
+            val results = statement.executeQuery()
+            results.next()
+            return results.getInt(1)
+        }
+    }
 }

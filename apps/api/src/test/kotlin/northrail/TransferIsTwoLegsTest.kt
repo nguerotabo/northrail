@@ -51,6 +51,27 @@ class TransferIsTwoLegsTest {
         }
     }
 
+    @Test
+    fun `calculate_account_balance`() {
+        LedgerDatabase.open().use { connection ->
+            val fromId = insertAccount(connection, 600L)
+            val toId = insertAccount(connection, 601L)
+            val from = Entry(accountId = fromId, amount = -50, transferId = 5L, timePosted = LocalDateTime.now())
+            val to = Entry(accountId = toId, amount = 50, transferId = 5L, timePosted = LocalDateTime.now())
+
+            LedgerService().storeEntry(connection, from, to)
+            val balanceFrom = LedgerService().calculateBalance(connection, fromId)
+            assertEquals(-50, balanceFrom)
+
+            val balanceTo = LedgerService().calculateBalance(connection, toId)
+            assertEquals(50, balanceTo)
+
+            LedgerService().insertOne(connection, accountId = fromId, amount = 20, transferId = 5L, timePosted = LocalDateTime.now())
+            val balanceFromNext = LedgerService().calculateBalance(connection, fromId)
+            assertEquals(-30, balanceFromNext)
+        }
+    }
+
     private fun insertAccount(connection: Connection, customerId: Long): Long {
         val sql = "insert into ledger.accounts (customer_id) values (?) returning id"
         connection.prepareStatement(sql).use { statement ->

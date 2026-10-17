@@ -20,6 +20,12 @@ CREATE TABLE ledger.entries(
     time_posted timestamp NOT NULL
 );
 
+CREATE TABLE ledger.outbox_events(
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    transfer_id bigint NOT NULL,
+    done timestamp
+);
+
 CREATE TABLE pii.customers(
     customer_id bigint PRIMARY KEY,
     full_name text NOT NULL
@@ -38,6 +44,7 @@ GRANT CONNECT ON DATABASE northrail TO pii_admin;
 GRANT USAGE ON SCHEMA ledger TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.accounts TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.entries TO ledger_admin;
+GRANT SELECT, INSERT ON ledger.outbox_events TO ledger_admin;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ledger TO ledger_admin;
 
 GRANT USAGE ON SCHEMA pii TO pii_admin;
