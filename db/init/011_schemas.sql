@@ -44,7 +44,7 @@ GRANT CONNECT ON DATABASE northrail TO pii_admin;
 GRANT USAGE ON SCHEMA ledger TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.accounts TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.entries TO ledger_admin;
-GRANT SELECT, INSERT ON ledger.outbox_events TO ledger_admin;
+GRANT SELECT, INSERT, UPDATE ON ledger.outbox_events TO ledger_admin;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ledger TO ledger_admin;
 
 GRANT USAGE ON SCHEMA pii TO pii_admin;
