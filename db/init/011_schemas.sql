@@ -54,5 +54,19 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA pii to pii_admin;
 ALTER ROLE ledger_admin SET search_path = ledger;
 ALTER ROLE pii_admin SET search_path = pii;
 
+/* Trigger functions */
+CREATE FUNCTION ledger.refuse_entry_edit()
+RETURNS Trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN 
+    RAISE EXCEPTION 'ledger entries cannot be changed';
+END;
+$$;
+
+CREATE TRIGGER entries_are_add_only
+BEFORE UPDATE OR DELETE ON ledger.entries
+FOR EACH ROW
+EXECUTE FUNCTION ledger.refuse_entry_edit();
 
 
