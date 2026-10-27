@@ -18,7 +18,7 @@ class LedgerEntryCannotBeEditedTest {
             "northrail",
             "northrail",
         ).use { connection ->
-            val accountId = insertAccount(connection, 50L)
+            val accountId = insertAccount(connection, 50L, "wealthsimple")
             val transferId = System.currentTimeMillis()
             val entryId = insertEntry(connection, accountId, 40, transferId)
 
@@ -43,7 +43,7 @@ class LedgerEntryCannotBeEditedTest {
     @Test
     fun `ledger_admin_cannot_edit_entry`() {
         LedgerDatabase.open().use { connection ->
-        val accountId = insertAccount(connection, 51L)
+        val accountId = insertAccount(connection, 51L, "wealthsimple")
         val entryId = insertEntry(connection, accountId, 40, System.currentTimeMillis())
 
         assertFails {
@@ -65,10 +65,11 @@ class LedgerEntryCannotBeEditedTest {
         }
     }
 
-    private fun insertAccount(connection: Connection, customerId: Long): Long {
-        val sql = "insert into ledger.accounts (customer_id) values (?) returning id"
+    private fun insertAccount(connection: Connection, customerId: Long, institution: String): Long {
+        val sql = "insert into ledger.accounts (customer_id, institution) values (?, ?) returning id"
         connection.prepareStatement(sql).use { statement ->
             statement.setLong(1, customerId)
+            statement.setString(2, institution)
             val results = statement.executeQuery()
             results.next()
             return results.getLong(1)

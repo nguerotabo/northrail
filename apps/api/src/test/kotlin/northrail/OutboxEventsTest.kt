@@ -14,8 +14,8 @@ class OutboxEventsTest {
     @Test 
     fun `correct_oubtbox_events_call`() {
         LedgerDatabase.open().use { connection ->
-        val fromId = insertAccount(connection, 700L)
-        val toId = insertAccount(connection, 701L)
+        val fromId = insertAccount(connection, 700L, "wealthsimple")
+        val toId = insertAccount(connection, 701L, "td")
         val from = Entry(accountId = fromId, amount = -40, transferId = 10L, timePosted = LocalDateTime.now())
         val to = Entry(accountId = toId, amount = 40, transferId = 10L, timePosted = LocalDateTime.now())
 
@@ -30,8 +30,8 @@ class OutboxEventsTest {
     @Test
     fun `incorrect_outbox_events_call`(){
         LedgerDatabase.open().use { connection ->
-        val fromId = insertAccount(connection, 702L)
-        val toId = insertAccount(connection, 703L)
+        val fromId = insertAccount(connection, 702L, "wealthsimple")
+        val toId = insertAccount(connection, 703L, "td")
         val from = Entry(accountId = fromId, amount = -40, transferId = 11L, timePosted = LocalDateTime.now())
         val to = Entry(accountId = toId, amount = 50, transferId = 11L, timePosted = LocalDateTime.now())
 
@@ -54,10 +54,11 @@ class OutboxEventsTest {
         }
     }
 
-    private fun insertAccount(connection: Connection, customerId: Long): Long {
-        val sql = "insert into ledger.accounts (customer_id) values (?) returning id"
+    private fun insertAccount(connection: Connection, customerId: Long, institution: String): Long {
+        val sql = "insert into ledger.accounts (customer_id, institution) values (?, ?) returning id"
         connection.prepareStatement(sql).use { statement ->
             statement.setLong(1, customerId)
+            statement.setString(2, institution)
             val results = statement.executeQuery()
             results.next()
             return results.getLong(1)

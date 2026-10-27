@@ -9,7 +9,8 @@ CREATE ROLE pii_admin LOGIN PASSWORD 'pii_admin';
 /* Tables from namespaces */
 CREATE TABLE ledger.accounts(
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    customer_id bigint NOT NULL
+    customer_id bigint NOT NULL,
+    institution text NOT NULL
 );
 
 CREATE TABLE ledger.entries(
@@ -31,10 +32,10 @@ CREATE TABLE pii.customers(
     full_name text NOT NULL
 );
 
-INSERT INTO ledger.accounts (customer_id) VALUES (300);
+INSERT INTO ledger.accounts (customer_id, institution) VALUES (300, 'wealthsimple');
 INSERT INTO pii.customers (customer_id, full_name) VALUES (300, 'User Test');
 
-INSERT INTO ledger.accounts (customer_id) VALUES (400);
+INSERT INTO ledger.accounts (customer_id, institution) VALUES (400, 'td');
 INSERT INTO pii.customers (customer_id, full_name) VALUES (400, 'User Test2');
 
 /* Role permission */

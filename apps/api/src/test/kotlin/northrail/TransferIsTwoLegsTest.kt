@@ -13,8 +13,8 @@ class TransferIsTwoLegsTest {
     @Test
     fun `transfer_is_atomic_two_legs`() {
         LedgerDatabase.open().use { connection ->
-            val fromId = insertAccount(connection, 301L)
-            val toId = insertAccount(connection, 302L)
+            val fromId = insertAccount(connection, 301L, "wealthsimple")
+            val toId = insertAccount(connection, 302L, "td")
             val from = Entry(accountId = fromId, amount = -40, transferId = 7L, timePosted = LocalDateTime.now())
             val to = Entry(accountId = toId, amount = 40, transferId = 7L, timePosted = LocalDateTime.now())
 
@@ -27,8 +27,8 @@ class TransferIsTwoLegsTest {
     @Test
     fun `transfer_amount_is_incorrect`() {
         LedgerDatabase.open().use { connection ->
-            val fromId = insertAccount(connection, 400L)
-            val toId = insertAccount(connection, 401L)
+            val fromId = insertAccount(connection, 400L, "wealthsimple")
+            val toId = insertAccount(connection, 401L, "td")
             val from = Entry(accountId = fromId, amount = -40, transferId = 2L, timePosted = LocalDateTime.now())
             val to = Entry(accountId = toId, amount = 50, transferId = 2L, timePosted = LocalDateTime.now())
 
@@ -40,8 +40,8 @@ class TransferIsTwoLegsTest {
     @Test
     fun `transferId_does_not_match`() {
         LedgerDatabase.open().use { connection ->
-            val fromId = insertAccount(connection, 500L)
-            val toId = insertAccount(connection, 501L)
+            val fromId = insertAccount(connection, 500L, "wealthsimple")
+            val toId = insertAccount(connection, 501L, "td")
             val from = Entry(accountId = fromId, amount = -40, transferId = 3L, timePosted = LocalDateTime.now())
             val to = Entry(accountId = toId, amount = 40, transferId = 4L, timePosted = LocalDateTime.now())
 
@@ -54,8 +54,8 @@ class TransferIsTwoLegsTest {
     @Test
     fun `calculate_account_balance`() {
         LedgerDatabase.open().use { connection ->
-            val fromId = insertAccount(connection, 600L)
-            val toId = insertAccount(connection, 601L)
+            val fromId = insertAccount(connection, 600L, "wealthsimple")
+            val toId = insertAccount(connection, 601L, "td")
             val from = Entry(accountId = fromId, amount = -50, transferId = 5L, timePosted = LocalDateTime.now())
             val to = Entry(accountId = toId, amount = 50, transferId = 5L, timePosted = LocalDateTime.now())
 
@@ -72,10 +72,11 @@ class TransferIsTwoLegsTest {
         }
     }
 
-    private fun insertAccount(connection: Connection, customerId: Long): Long {
-        val sql = "insert into ledger.accounts (customer_id) values (?) returning id"
+    private fun insertAccount(connection: Connection, customerId: Long, institution: String): Long {
+        val sql = "insert into ledger.accounts (customer_id, institution) values (?, ?) returning id"
         connection.prepareStatement(sql).use { statement ->
             statement.setLong(1, customerId)
+            statement.setString(2, institution)
             val results = statement.executeQuery()
             results.next()
             return results.getLong(1)

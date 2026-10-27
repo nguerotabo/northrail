@@ -17,8 +17,8 @@ class OutboxWorkerTest{
     fun `worker_crash_still_applies_once`() {
         LedgerDatabase.open().use { connection ->
         closeUnfinished(connection)
-        val fromId = insertAccount(connection, 11L)
-        val toId = insertAccount(connection, 12L)
+        val fromId = insertAccount(connection, 11L, "wealthsimple")
+        val toId = insertAccount(connection, 12L, "td")
         val transferId = System.currentTimeMillis()
         val from = Entry(accountId = fromId, amount = -40, transferId = transferId, timePosted = LocalDateTime.now())
         val to = Entry(accountId = toId, amount = 40, transferId = transferId, timePosted = LocalDateTime.now())
@@ -37,8 +37,8 @@ class OutboxWorkerTest{
     fun `same_key_never_double_posts`() {
         LedgerDatabase.open().use { connection ->
             closeUnfinished(connection)
-            val fromId = insertAccount(connection, 21L)
-            val toId = insertAccount(connection, 22L)
+            val fromId = insertAccount(connection, 21L, "wealthsimple")
+            val toId = insertAccount(connection, 22L, "td")
             val transferId = System.currentTimeMillis()
             val from = Entry(accountId = fromId, amount = -40, transferId = transferId, timePosted = LocalDateTime.now())
             val to = Entry(accountId = toId, amount = 40, transferId = transferId, timePosted = LocalDateTime.now())
@@ -52,10 +52,11 @@ class OutboxWorkerTest{
         }
     }
 
-    private fun insertAccount(connection: Connection, customerId: Long): Long {
-        val sql = "insert into ledger.accounts (customer_id) values (?) returning id"
+    private fun insertAccount(connection: Connection, customerId: Long, institution: String): Long {
+        val sql = "insert into ledger.accounts (customer_id, institution) values (?, ?) returning id"
         connection.prepareStatement(sql).use { statement ->
             statement.setLong(1, customerId)
+            statement.setString(2, institution)
             val results = statement.executeQuery()
             results.next()
             return results.getLong(1)
