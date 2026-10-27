@@ -1,0 +1,16 @@
+---
+description: Follow the Northrail design in plan.md and do not drift toward whatever is already coded
+alwaysApply: true
+---
+
+# Northrail plan
+
+Before changing the schema, ledger services, or their tests, read `plan.md` at the repo root and follow it.
+
+`plan.md` is the Project 2 design. The code is behind that design. Build the next unfinished step in "Build order". Do not drop a planned rule, table, or test because it is not in the repo yet. Do not add Kafka, extra services, a second currency, or a custom code-analysis engine. Those are listed under "Left out on purpose".
+
+A test with the right name still has to prove the behavior in "The six tests".
+
+When a decision in `plan.md` changes, update that file in the same change. When a planned piece is actually done, move it into "In the code today" and name the next step. Leave task logs and chat notes out of it.
+
+Example: teaching the outbox worker to deliver to the other bank updates "In the code today" so it no longer says the worker only marks `done`, and names step 3 as next.
