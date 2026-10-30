@@ -27,6 +27,17 @@ CREATE TABLE ledger.outbox_events(
     done timestamp
 );
 
+CREATE TABLE ledger.settlement_batches(
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    business_date date NOT NULL,
+    created timestamp
+);
+
+CREATE TABLE ledger.settlement_transfers(
+    batch_id bigint NOT NULL REFERENCES ledger.settlement_batches (id),
+    transfer_id bigint PRIMARY KEY
+);
+
 CREATE TABLE pii.customers(
     customer_id bigint PRIMARY KEY,
     full_name text NOT NULL
@@ -47,6 +58,8 @@ GRANT SELECT, INSERT ON ledger.accounts TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.entries TO ledger_admin;
 GRANT SELECT, INSERT, UPDATE ON ledger.outbox_events TO ledger_admin;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ledger TO ledger_admin;
+GRANT SELECT, INSERT ON ledger.settlement_batches TO ledger_admin;
+GRANT SELECT, INSERT ON ledger.settlement_transfers TO ledger_admin;
 
 GRANT USAGE ON SCHEMA pii TO pii_admin;
 GRANT SELECT, INSERT ON pii.customers TO pii_admin;
