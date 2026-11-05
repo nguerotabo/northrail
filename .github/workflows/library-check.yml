@@ -1,0 +1,20 @@
+name: Library check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  scan:
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.7.0
+    with:
+      scan-args: |-
+        --lockfile=gradle.lockfile:./apps/api/gradle.lockfile
+      fail-on-vuln: true
+      upload-sarif: false
