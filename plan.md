@@ -101,11 +101,11 @@ Present, and still short of the design:
 - `ledger` and `pii` schemas. `ledger_admin` cannot read `pii`. The app and `LedgerDatabase` connect as `ledger_admin`.
 - `ledger.accounts` (`customer_id`, `institution` text) and `ledger.entries` (integer `amount`, `transfer_id`, `time_posted`). `Account` and `Entry` match those columns. There is no `transfers` table, no `Money` type, and no `InstitutionId`.
 - `LedgerService.storeEntry` inserts two legs and rolls back unless the amounts sum to zero and the transfer ids match. `calculateBalance` sums amounts. There is no stored balance.
-- `TransferService.storeOutboxEntry` writes the two legs and one outbox row in one transaction.
+- `TransferService.storeOutboxEntry` writes the two legs and one outbox row in one transaction. `injectBreak` defaults to false. When it is true, the credit leg is skipped.
 - `entries_are_add_only` rejects `UPDATE` and `DELETE`. Grants match that: insert and select on entries, no update or delete.
 - `OutboxWorker.deliver` locks the oldest undone outbox row and sets `done`. It does not send to the other bank. A second run does not post again because the worker never posts.
-- `ledger.recon_breaks` is one difference the recon job found. `break_type` is `missing`, `wrong_amount`, or `unmatched`. Each side keeps the institution and the integer amount that bank recorded. `ledger_admin` can insert and select. The finder is not built.
+- `ReconJob.find` compares the amount each bank recorded for a transfer and writes one `ledger.recon_breaks` row. `break_type` is `missing`, `wrong_amount`, or `unmatched`. A second run skips a transfer that already has a break. `ledger_admin` can insert and select.
 
-Tests 1, 2, and 3 exist by name. Test 1 matches the rule. Tests 2 and 3 do not yet prove receiving-bank exactly-once apply, because nothing applies an inbound transfer. Tests 5 and 6 do not exist. The checker and the web page do not exist.
+Tests 1, 2, 3, and 4 exist by name. Test 1 matches the rule. Tests 2 and 3 do not yet prove receiving-bank exactly-once apply, because nothing applies an inbound transfer. Test 5, `missing_credit_becomes_break`, drops one credit and the finder records `missing`. `wrong_amount_becomes_break` and `unmatched_becomes_break` cover the other two types. Test 6 does not exist. The checker and the web page do not exist. Library versions are not locked.
 
-Next work is the recon finder: the three break types, then the inject-a-break switch and test 5.
+Next work is the library checks: lock versions, verify checksums, and fail CI when a new library has a known problem. Then step 6, danger-checker layer 1.
