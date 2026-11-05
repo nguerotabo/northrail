@@ -5,15 +5,21 @@ import java.time.LocalDateTime
 
 class TransferService {
 
-    fun storeOutboxEntry(connection: Connection, from: Entry, to: Entry) {
+    fun storeOutboxEntry(connection: Connection, from: Entry, to: Entry, injectBreak: Boolean = false) {
         connection.autoCommit = false
         try {
-            insertOne(connection, from.accountId, from.amount, from.transferId, from.timePosted)
-            insertOne(connection, to.accountId, to.amount, to.transferId, to.timePosted)
-            insertOneOutbox(connection, from.transferId, to.timePosted)
-            if (from.amount + to.amount != 0 || !from.transferId.equals(to.transferId)) {
-                connection.rollback()
+            if (injectBreak == false){
+                insertOne(connection, from.accountId, from.amount, from.transferId, from.timePosted)
+                insertOne(connection, to.accountId, to.amount, to.transferId, to.timePosted)
+                insertOneOutbox(connection, from.transferId, to.timePosted)
+                if (from.amount + to.amount != 0 || !from.transferId.equals(to.transferId)) {
+                    connection.rollback()
+                } else {
+                    connection.commit()
+                }
             } else {
+                insertOne(connection, from.accountId, from.amount, from.transferId, from.timePosted)
+                insertOneOutbox(connection, from.transferId, to.timePosted)
                 connection.commit()
             }
         } catch (error: Exception) {

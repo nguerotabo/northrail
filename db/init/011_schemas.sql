@@ -38,6 +38,17 @@ CREATE TABLE ledger.settlement_transfers(
     transfer_id bigint PRIMARY KEY
 );
 
+CREATE TABLE ledger.recon_breaks(
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    transfer_id bigint,
+    break_type text NOT NULL CHECK(break_type IN ('missing', 'wrong_amount', 'unmatched')),
+    from_institution text NOT NULL,
+    from_amount integer,
+    to_institution text NOT NULL,
+    to_amount integer, 
+    created timestamp
+);
+
 CREATE TABLE pii.customers(
     customer_id bigint PRIMARY KEY,
     full_name text NOT NULL
@@ -60,6 +71,7 @@ GRANT SELECT, INSERT, UPDATE ON ledger.outbox_events TO ledger_admin;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ledger TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.settlement_batches TO ledger_admin;
 GRANT SELECT, INSERT ON ledger.settlement_transfers TO ledger_admin;
+GRANT SELECT, INSERT ON ledger.recon_breaks TO ledger_admin;
 
 GRANT USAGE ON SCHEMA pii TO pii_admin;
 GRANT SELECT, INSERT ON pii.customers TO pii_admin;

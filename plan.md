@@ -104,7 +104,8 @@ Present, and still short of the design:
 - `TransferService.storeOutboxEntry` writes the two legs and one outbox row in one transaction.
 - `entries_are_add_only` rejects `UPDATE` and `DELETE`. Grants match that: insert and select on entries, no update or delete.
 - `OutboxWorker.deliver` locks the oldest undone outbox row and sets `done`. It does not send to the other bank. A second run does not post again because the worker never posts.
+- `ledger.recon_breaks` is one difference the recon job found. `break_type` is `missing`, `wrong_amount`, or `unmatched`. Each side keeps the institution and the integer amount that bank recorded. `ledger_admin` can insert and select. The finder is not built.
 
-Tests 1, 2, and 3 exist by name. Test 1 matches the rule. Tests 2 and 3 do not yet prove receiving-bank exactly-once apply, because nothing applies an inbound transfer. Tests 4, 5, and 6 do not exist. Settlement, recon, the checker, and the web page do not exist.
+Tests 1, 2, and 3 exist by name. Test 1 matches the rule. Tests 2 and 3 do not yet prove receiving-bank exactly-once apply, because nothing applies an inbound transfer. Tests 5 and 6 do not exist. The checker and the web page do not exist.
 
-Next work is step 2: the worker delivers to the other bank, and that bank applies each transfer once. Then tests 2 and 3 should prove that behavior.
+Next work is the recon finder: the three break types, then the inject-a-break switch and test 5.
